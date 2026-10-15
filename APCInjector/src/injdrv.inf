@@ -1,0 +1,52 @@
+;
+; Demand-start WDM driver. Injection stays off until IOCTL_INJDRV_ENABLE.
+;
+
+[Version]
+Signature   = "$Windows NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %ProviderName%
+CatalogFile = APCInjector.cat
+DriverVer   = 10/15/2026,1.0.0.0
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,
+
+[SourceDisksFiles]
+APCInjector.sys = 1,,
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTamd64,NTx86
+
+[Standard.NTamd64]
+%DiskName% = Injdrv_Install, Root\Injdrv
+
+[Standard.NTx86]
+%DiskName% = Injdrv_Install, Root\Injdrv
+
+[Injdrv_Install.NT]
+CopyFiles = Injdrv_CopyFiles
+
+[Injdrv_Install.NT.Services]
+AddService = APCInjector,0x00000002,Injdrv_Service
+
+[Injdrv_CopyFiles]
+APCInjector.sys
+
+[Injdrv_Service]
+DisplayName   = %ServiceDesc%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %13%\APCInjector.sys
+
+[Strings]
+ProviderName     = "APCInjector"
+ManufacturerName = "APCInjector"
+DiskName         = "APCInjector"
+ServiceDesc      = "APCInjector"
