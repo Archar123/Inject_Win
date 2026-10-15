@@ -1,0 +1,52 @@
+; ============================================================
+;  CreateProcessInject - sample configuration
+;  Place this file next to injector.exe as 'cfg.ini'
+; ============================================================
+
+[Inject]
+; Mode = Create : launch target with CREATE_SUSPENDED, inject, then resume.
+; Mode = Scan   : poll running processes, inject as soon as target appears.
+Mode              = Create
+
+; Target process image name (used by both modes for identification / scan).
+TargetProcess     = notepad.exe
+
+; --------- Create mode options ---------
+; Full path of the target executable (required when Mode=Create).
+ExePath           = C:\Windows\System32\notepad.exe
+
+; Optional command line passed to CreateProcess (leave empty for none).
+; Example: CommandLine = "C:\Windows\System32\notepad.exe" "C:\test.txt"
+CommandLine       =
+
+; Optional working directory for the new process.
+WorkingDir        =
+
+; If the same process is already running, wait for it to exit before launching.
+WaitForClose      = true
+
+; Delay (ms) between injection and ResumeThread.
+; Useful so the DLL has time to finish DllMain before the real entrypoint runs.
+PostInjectDelayMs = 2000
+
+; Resume the main thread after injection. Set false to leave the process suspended.
+ResumeAfterInject = true
+
+; --------- Scan mode options ---------
+; How often (ms) to poll the process list.
+ScanIntervalMs    = 500
+
+; Freeze the target with NtSuspendProcess before injecting and resume it after.
+; Highly recommended: without this the target's threads keep running during
+; VirtualAllocEx / WriteProcessMemory / CreateRemoteThread, which can race
+; anti-cheat init and let detection fire before DllMain returns.
+SuspendBeforeInject = true
+
+; --------- Common options ---------
+; DLL to inject. Relative paths are resolved next to injector.exe.
+DllPath           = CLibrary.dll
+
+; Injection technique:
+;   false = CreateRemoteThread + LoadLibraryA  (simple, DLL stays visible to the loader)
+;   true  = ManualMap                          (stealthier, no PEB module entry)
+ManualMap         = false
